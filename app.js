@@ -1,5 +1,5 @@
-const {logger} = require('./utils/logger');
 const userRoutes = require('./routes/userRoutes')
+const ticketRoutes = require('./routes/ticketRoutes')
 const express = require('express')
 
 const app = express()
@@ -7,12 +7,10 @@ const port = 3000
 
 app.use(express.json())
 
-// app.get('/', (req, res) => {
-//   res.send('Hello World!')
-// })
-
 app.use("/user", userRoutes)
+app.use("/tickets", ticketRoutes)
+
 
 app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`)
+  console.log(`Listening on port ${port}`)
 })

@@ -11,11 +11,15 @@ router.post("/register", async (req, res) => {
     //register with username and password
     //username must be unique
     //set default employee role, maybe in model?
+    logger.info("New user ___ registered")
+    res.send("Successfully registered new user")
 })
 
 router.post("/login", async (req, res) => {
     //first must check if username exists
     //then login user if password matches
+    logger.info("___ logged in")
+    res.send("Successfully logged in user")
 })
 
 module.exports = router;
