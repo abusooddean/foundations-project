@@ -1,8 +1,8 @@
-function checkIfValid(result, action){
+function checkIfValid(result, action, item){
     if(!result){
-        return {message: `failed to ${action} user`};
+        return {message: `failed to ${action} ${item}`};
     }else{
-        return {message: `${action}d user`, user: result};
+        return {message: `${action}d ${item}`, user: result};
     }
 }
 
