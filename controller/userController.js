@@ -1,5 +1,6 @@
 const express = require('express')
 const router = express.Router();
+const {logger} = require('../utils/logger');
 
 //TO DO:
 // Login / Register Feature
@@ -7,6 +8,7 @@ const router = express.Router();
 // These features allow you to ensure you can track or maintain who can connect to your application. 
 // User Stories As an Employee or Manager, I should be able to log into the application.
 
+//user register
 router.post("/register", async (req, res) => {
     //register with username and password
     //username must be unique
@@ -15,6 +17,7 @@ router.post("/register", async (req, res) => {
     res.send("Successfully registered new user")
 })
 
+//user login
 router.post("/login", async (req, res) => {
     //first must check if username exists
     //then login user if password matches
