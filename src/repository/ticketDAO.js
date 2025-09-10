@@ -17,7 +17,7 @@ async function createTicket(ticket){
 
     try{
         await documentClient.send(command);
-        logger.info("New ticket created by createTicket()")
+        logger.info(`PUT command to database complete ${JSON.stringify(data)}`);
         return ticket;
     }
     catch(error){

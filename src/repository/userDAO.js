@@ -17,7 +17,7 @@ async function createUser(user){
 
     try{
         await documentClient.send(command);
-        logger.info("New user created by createUser()")
+        logger.info(`PUT command to database complete ${JSON.stringify(data)}`);
         return user;
     }
     catch(error){
@@ -36,7 +36,7 @@ async function getUserByUserId(user_id){
 
     try{
         const data = await documentClient.send(command);
-        logger.info("user_id queried by getUserByUserId()")
+        logger.info(`GET command to database complete ${JSON.stringify(data)}`);
         return data.Item;
     }
     catch(error){
