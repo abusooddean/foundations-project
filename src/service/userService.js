@@ -46,6 +46,6 @@ function validateUser(user){
 
 module.exports = {
     createUser,
-    // getUserById,
-    // deleteUser
+    checkIfUsernameExists,
+    validateUser,
 }

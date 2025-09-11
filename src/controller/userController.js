@@ -1,3 +1,4 @@
+require("dotenv").config();
 const express = require('express')
 const router = express.Router();
 const {logger} = require('../util/logger');
@@ -7,20 +8,15 @@ const userService = require("../service/userService");
 const {authenticateToken } = require("../util/jwt");
 
 
-const secretKey = "my-secret-key"
-//TO DO:
-// Login / Register Feature
-// The login and register feature is meant to give you preliminary experience handling authentication within an application. 
-// These features allow you to ensure you can track or maintain who can connect to your application. 
-// User Stories As an Employee or Manager, I should be able to log into the application.
+const SECRET_KEY = process.env.SECRET_KEY;
 
 //user register
-router.post("/", validatePostUser, async (req, res) => {
+router.post("/register", validateCreateUser, checkIfUsernameExists, async (req, res) => {
     const data = await userService.createUser(req.body);
     if(data){
         res.status(201).json({message: `Created User ${JSON.stringify(data)}`});
     }else{
-        res.status(400).json({message: "user not created", data: req.body});
+        res.status(400).json({message: "User not created", data: req.body});
     }
 } )
 
@@ -39,18 +35,28 @@ router.post("/login", async (req, res) => {
                 expiresIn: "15m"
             }
         );
-        res.status(200).json({message: "you have logged in", token});
+        res.status(200).json({message: "You have logged in", token});
     }else{
-        res.status(401).json({message: "invalid login"});
+        res.status(401).json({message: "Invalid login"});
     }
 })
 
-function validatePostUser(req, res, next){
+function validateCreateUser(req, res, next){
     const user = req.body;
     if(user.username && user.password){
         next();
     }else{
-        res.status(400).json({message: "invalid username or password", data: user});
+        res.status(400).json({message: "Invalid username or password", data: user});
+    }
+}
+
+async function checkIfUsernameExists(req, res, next){
+    const username  = req.body.username;
+    const usernameExists = await userService.checkIfUsernameExists(username);
+    if(usernameExists){
+        res.status(400).json({message: "Username already exists", data: username});
+    }else{
+        next();
     }
 }
 
