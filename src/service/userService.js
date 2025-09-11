@@ -17,7 +17,7 @@ async function createUser(user){
             user_id: crypto.randomUUID(),
             username,
             password,
-            isManager: false,
+            isManager: user.isManager ?? false, //if input then set otherwise default to false
         })
         logger.info(`Creating new user: ${JSON.stringify(data)}`);
         return data;
