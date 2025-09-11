@@ -23,14 +23,14 @@ router.post("/register", validateCreateUser, checkIfUsernameExists, async (req, 
 //user login
 router.post("/login", async (req, res) => {
     const {username, password} = req.body;
-    const data = await userService.validateLogin(username, password);
+    const data = await userService.validateUserCredentials({username, password});
     if(data){
         const token = jwt.sign(
             {
                 id: data.user_id,
                 username
             },
-            secretKey,
+            SECRET_KEY,
             {
                 expiresIn: "15m"
             }
