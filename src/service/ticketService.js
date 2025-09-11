@@ -42,6 +42,26 @@ async function updateTicketStatusByTicketId(ticket_id, user_id, status){
     }
 }
 
+//check if manager
+async function getTicketByStatus(user_id, status){
+    if(await validateIsManager(user_id)){
+        if(status){
+                const data = await ticketDAO.getTicketByStatus(status);
+                console.log(data);
+                logger.info(`Getting all pending ticket: ${JSON.stringify(data)}`);
+                return data;
+            }
+        else{
+            logger.info(`Unable to get tickets: ${JSON.stringify(data)}`);
+            return null;
+        }
+    }
+    else{
+        logger.info(`User is not a manager: ${JSON.stringify(user_id)}`);
+            return null;
+    }
+}
+
 async function validateIsManager(user_id){
     const user = await userDAO.getUserByUserId(user_id);
     return user.isManager;
@@ -65,3 +85,5 @@ function validateTicket(ticket){
 
 // updateTicketStatusByTicketId("5", "86669adf-6f6a-4acd-a3cf-de46e922257c", "Denied") //not manager
 // updateTicketStatusByTicketId("5", "ff059095-ee84-4c1d-a834-3f05e529aca7", "Approved") //manager
+
+//getTicketByStatus("ff059095-ee84-4c1d-a834-3f05e529aca7", "Pending");
