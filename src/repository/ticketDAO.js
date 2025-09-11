@@ -1,5 +1,5 @@
-const { DynamoDBClient, QueryCommand} = require("@aws-sdk/client-dynamodb");
-const { DynamoDBDocumentClient, GetCommand, PutCommand, DeleteCommand, ScanCommand, UpdateCommand} = require("@aws-sdk/lib-dynamodb")
+const { DynamoDBClient} = require("@aws-sdk/client-dynamodb");
+const { DynamoDBDocumentClient, GetCommand, PutCommand, ScanCommand, UpdateCommand} = require("@aws-sdk/lib-dynamodb")
 const {logger} = require('../util/logger');
 
 const client = new DynamoDBClient({region: "us-east-1"});
@@ -38,7 +38,7 @@ async function getTicketByStatus(status) {
 
     try{
         const data = await documentClient.send(command);
-        console.log(data.Items);
+        // console.log(data.Items);
         logger.info(`SCAN command to database complete ${JSON.stringify(data)}`);
         return data.Items;
     }catch(error){
@@ -102,5 +102,6 @@ async function updateTicketStatusByTicketId(ticket_id, status){
 module.exports = {
     createTicket,
     getTicketByStatus,
-    getTicketById
+    getTicketById,
+    updateTicketStatusByTicketId
 }
