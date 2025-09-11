@@ -8,7 +8,7 @@ const documentClient = DynamoDBDocumentClient.from(client);
 
 const TableName = "tickets";
 
-// ticket must have amount, desc, and default status of pending
+// ticket must have amount, desc, and default status of pending (+ user_id)
 async function createTicket(ticket){
     const command = new PutCommand({
         TableName,
@@ -26,7 +26,7 @@ async function createTicket(ticket){
     }
 }
 
-async function getTicketByStatus(status) {
+async function getTicketsByStatus(status) {
     const command = new ScanCommand({
         TableName,
         FilterExpression: "#status = :status",
@@ -109,7 +109,7 @@ async function getAllTicketsByUserId(user_id){
 
 module.exports = {
     createTicket,
-    getTicketByStatus,
+    getTicketsByStatus,
     getTicketById,
     updateTicketStatusByTicketId,
     getAllTicketsByUserId
