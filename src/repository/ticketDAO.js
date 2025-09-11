@@ -26,8 +26,6 @@ async function createTicket(ticket){
     }
 }
 
-// createTicket({ticket_id: "5",user_id: "be1e0bc1-9608-4ce4-887d-bcec6c5ced8a", amount: 1000000 , description: "dinner", status:"Pending"});
-
 async function getTicketByStatus(status) {
     const command = new ScanCommand({
         TableName,
@@ -38,7 +36,6 @@ async function getTicketByStatus(status) {
 
     try{
         const data = await documentClient.send(command);
-        // console.log(data.Items);
         logger.info(`SCAN command to database complete ${JSON.stringify(data)}`);
         return data.Items;
     }catch(error){
@@ -46,8 +43,6 @@ async function getTicketByStatus(status) {
         return null;
     }
 }
-
-// getTicketByStatus("Pending");
 
 async function getTicketById(ticket_id){
     const command = new GetCommand({
@@ -57,7 +52,6 @@ async function getTicketById(ticket_id){
 
     try{
         const data = await documentClient.send(command);
-        // console.log(data.Item);
         logger.info(`GET command to database complete ${JSON.stringify(data)}`);
         return data.Item;
     }
@@ -95,13 +89,28 @@ async function updateTicketStatusByTicketId(ticket_id, status){
     }
 }
 
-// updateTicketStatusByTicketId("023712ea-367e-4fe0-9b04-3fe0b48aa869", "Denied");
+async function getAllTicketsByUserId(user_id){
+    const command = new ScanCommand({
+        TableName,
+        FilterExpression: "#user_id = :user_id",
+        ExpressionAttributeNames: {"#user_id": "user_id"},
+        ExpressionAttributeValues: {":user_id": user_id}
+    });
 
-// getTicketById("1");
+    try{
+        const data = await documentClient.send(command);
+        logger.info(`SCAN command to database complete ${JSON.stringify(data)}`);
+        return data.Items;
+    }catch(error){
+        logger.error(error);
+        return null;
+    }
+}
 
 module.exports = {
     createTicket,
     getTicketByStatus,
     getTicketById,
-    updateTicketStatusByTicketId
+    updateTicketStatusByTicketId,
+    getAllTicketsByUserId
 }

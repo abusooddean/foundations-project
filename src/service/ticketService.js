@@ -20,7 +20,7 @@ async function createTicket(ticket){
     }
 }
 
-// --- only need certain values such as ticket_id ? and update its status --- check if isManager = true
+// 3. Ticketing System Feature
 async function updateTicketStatusByTicketId(ticket_id, user_id, status){  
     //get user and verify isManager
     if(await validateIsManager(user_id)){ //isManager
@@ -42,7 +42,7 @@ async function updateTicketStatusByTicketId(ticket_id, user_id, status){
     }
 }
 
-//check if manager
+
 async function getTicketByStatus(user_id, status){
     if(await validateIsManager(user_id)){
         if(status){
@@ -62,6 +62,21 @@ async function getTicketByStatus(user_id, status){
     }
 }
 
+// 4. View Previous Tickets Feature 
+async function getAllTicketsByUserId(user_id){
+    if(user_id){ //can add check to see if it exists later
+        const data = await ticketDAO.getAllTicketsByUserId(user_id);
+        logger.info(`Getting all ticket submissions for user: ${JSON.stringify(data)}`)
+    }
+    else{
+        logger.info(`User has no tickets: ${JSON.stringify(user_id)}`);
+        return null;
+    }
+}
+
+
+
+// VALIDATION functions
 async function validateIsManager(user_id){
     const user = await userDAO.getUserByUserId(user_id);
     return user.isManager;
