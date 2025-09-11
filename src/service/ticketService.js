@@ -1,4 +1,5 @@
 const ticketDAO = require("../repository/ticketDAO");
+const userDAO = require("../repository/userDAO");
 const {logger} = require('../util/logger')
 
 async function createTicket(ticket){
@@ -19,22 +20,37 @@ async function createTicket(ticket){
     }
 }
 
-// async function updateTicket(ticket){  --- only need certain values such as ticket_id ? and update its status ---
-//     if(ticket){
-//     const data = await ticketDAO.updateTicket({
-//             ticket_id: ticket.ticket_id,
-//             user_id: ticket.user_id,
-//             amount: ticket.amount,
-//             description: ticket.description,
-//             status: ticket.status,
-//         })
-//         logger.info(`Updating ticket: ${JSON.stringify(data)}`);
-//         return data;
-//     }else{
-//         logger.info(`Failed to update ticket: ${JSON.stringify(ticket)}`);
-//         return null;
-//     }
-// }
+// --- only need certain values such as ticket_id ? and update its status --- check if isManager = true
+async function updateTicketStatusByTicketId(ticket_id, user_id, status){  
+    //get user and verify isManager
+    if(await validateIsManager(user_id)){ //isManager
+        if(ticket_id && status){ //not empty
+            if(await validateTicketIsPending(ticket_id)){
+                const data = await ticketDAO.updateTicketStatusByTicketId(ticket_id, status);
+                logger.info(`Updating ticket: ${JSON.stringify(data)}`);
+                return data;
+            }
+        }
+        else{
+            logger.info(`Failed to update ticket: ${JSON.stringify(ticket_id)}`);
+            return null;
+        }      
+    }
+    else{
+        logger.info(`User is not a manager: ${JSON.stringify(user_id)}`);
+        return user_id;
+    }
+}
+
+async function validateIsManager(user_id){
+    const user = await userDAO.getUserByUserId(user_id);
+    return user.isManager;
+}
+
+async function validateTicketIsPending(ticket_id){
+    const ticket = await ticketDAO.getTicketById(ticket_id);
+    return ticket.status === "Pending";
+}
 
 function validateTicket(ticket){
     const ticketAmount = ticket.amount > 0;
@@ -47,4 +63,5 @@ function validateTicket(ticket){
 // createTicket({user_id: "be1e0bc1-9608-4ce4-887d-bcec6c5ced8a", amount: 100 , description: "flight"});
 // createTicket({user_id: "be1e0bc1-9608-4ce4-887d-bcec6c5ced8a", amount: 1000 , description: "dinner"});
 
-// updateTicket({ticket_id: "933fdc36-9512-454e-8eb5-a035819ce859", user_id: "be1e0bc1-9608-4ce4-887d-bcec6c5ced8a", amount: 10 , description: "business lunch", status:"Processing"});
+// updateTicketStatusByTicketId("5", "86669adf-6f6a-4acd-a3cf-de46e922257c", "Denied") //not manager
+// updateTicketStatusByTicketId("5", "ff059095-ee84-4c1d-a834-3f05e529aca7", "Approved") //manager
