@@ -2,6 +2,7 @@ const ticketDAO = require("../repository/ticketDAO");
 const userDAO = require("../repository/userDAO");
 const {logger} = require('../util/logger')
 
+//2. Submit Ticket Feature
 async function createTicket(ticket){
     //check fields before creating
     if(validateTicket(ticket)){
@@ -42,24 +43,16 @@ async function updateTicketStatusByTicketId(ticket_id, user_id, status){
     }
 }
 
-
-async function getTicketsByStatus(user_id, status){
-    if(await validateIsManager(user_id)){
+async function getTicketsByStatus(status){
         if(status){
-                const data = await ticketDAO.getTicketsByStatus(status);
-                console.log(data);
-                logger.info(`Getting all pending ticket: ${JSON.stringify(data)}`);
-                return data;
-            }
+            const data = await ticketDAO.getTicketsByStatus(status);
+            logger.info(`Getting all pending ticket: ${JSON.stringify(data)}`);
+            return data;
+        }
         else{
             logger.info(`Unable to get tickets: ${JSON.stringify(data)}`);
             return null;
         }
-    }
-    else{
-        logger.info(`User is not a manager: ${JSON.stringify(user_id)}`);
-            return null;
-    }
 }
 
 // 4. View Previous Tickets Feature 
@@ -74,9 +67,7 @@ async function getAllTicketsByUserId(user_id){
     }
 }
 
-
-
-// VALIDATION functions
+// VALIDATION/MIDDLEWARE functions
 async function validateIsManager(user_id){
     const user = await userDAO.getUserByUserId(user_id);
     return user.isManager;
@@ -93,18 +84,9 @@ function validateTicket(ticket){
     return (ticketAmount && ticketDescription);
 }
 
-//TESTING
-// createTicket({user_id: "1", amount: 10 , description: "business dinner"});
-// createTicket({user_id: "be1e0bc1-9608-4ce4-887d-bcec6c5ced8a", amount: 100 , description: "flight"});
-// createTicket({user_id: "be1e0bc1-9608-4ce4-887d-bcec6c5ced8a", amount: 1000 , description: "dinner"});
-
-// updateTicketStatusByTicketId("5", "86669adf-6f6a-4acd-a3cf-de46e922257c", "Denied") //not manager
-// updateTicketStatusByTicketId("5", "ff059095-ee84-4c1d-a834-3f05e529aca7", "Approved") //manager
-
-//getTicketByStatus("ff059095-ee84-4c1d-a834-3f05e529aca7", "Pending");
-
 module.exports = {
     createTicket,
     updateTicketStatusByTicketId,
-    getTicketsByStatus
+    getTicketsByStatus,
+    validateIsManager
 }

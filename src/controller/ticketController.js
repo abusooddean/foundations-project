@@ -15,22 +15,20 @@ router.post("/", validateTicketData, async (req, res) => {
         }
 })
 
+//get all pending tickets
 
+router.get("/", validateIsManager, async (req, res) => {
+    const data = await ticketService.getTicketsByStatus(req.body.status);
+    if(data){
+        res.status(201).json({message: `All pending tickets: ${JSON.stringify(data)}`})
+    }else{
+        res.status(400).json({message: "No pending tickets found", data: req.body});
+    }
+})
 
+//update pending ticket
+//get tickets by user_id
 
-// //filter tickets by status
-// router.get(`/status=${ticketStatus}`, async (req, res) => {
-//     //verify only manager?
-//     logger.info("___ viewing all pending tickets")
-//     res.send("Successful GET")
-// })
-
-// //see specific employee tickets
-// router.get(`/${employeeId}`, async (req, res) => {
-//     //verify only manager?
-//     logger.info("___ viewing all employee tickets")
-//     res.send("Successful GET")
-// })
 
 function validateTicketData(req, res, next){
     const ticket = req.body;
@@ -41,6 +39,14 @@ function validateTicketData(req, res, next){
     }
 }
 
+async function validateIsManager(req, res, next){
+    const user_id = req.body.user_id;
+    if(await ticketService.validateIsManager(user_id)){
+        next();
+    }else{
+        res.status(400).json({message: "User is not a manager", data: user_id});
+    }
+}
 
 
 module.exports = router;
