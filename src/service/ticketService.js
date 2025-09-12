@@ -51,6 +51,7 @@ async function getTicketsByUserId(user_id){
     if(user_id){ //can add check to see if it exists later
         const data = await ticketDAO.getTicketsByUserId(user_id);
         logger.info(`Getting all ticket submissions for user: ${JSON.stringify(data)}`)
+        return data;
     }
     else{
         logger.info(`User has no tickets: ${JSON.stringify(user_id)}`);

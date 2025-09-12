@@ -6,6 +6,8 @@ const ticketService = require("../service/ticketService");
 // //The submit ticket feature is meant to guide you through input acceptance, validation, and error handling. 
 // // The ability to submit a reimbursement request ticket is the core functionality of this application. 
 // // User Stories Employees can submit a new reimbursement ticket
+
+//create ticket
 router.post("/", validateTicketData, async (req, res) => {
     const data = await ticketService.createTicket(req.body);
     if(data){
@@ -16,7 +18,6 @@ router.post("/", validateTicketData, async (req, res) => {
 })
 
 //get all pending tickets
-
 router.get("/", validateIsManager, async (req, res) => {
     const data = await ticketService.getTicketsByStatus(req.body.status);
     if(data){
@@ -36,7 +37,16 @@ router.post("/update", validateTicketUpdateData && validateIsManager, async (req
     }
 })
 
-//get tickets by user_id
+//get tickets by user_id https://github.com/expressjs/express/blob/master/examples/params/index.js
+router.get("/submissions/:userId", async (req, res) => {
+    const userId = req.query.user_id;
+    const data = await ticketService.getTicketsByUserId(userId);
+    if(data){
+        res.status(201).json({message: `All user tickets: ${JSON.stringify(data)}`})
+    }else{
+        res.status(400).json({message: "No tickets found", data: req.body});
+    }
+})
 
 //middleware/validation checks
 function validateTicketData(req, res, next){
