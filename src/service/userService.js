@@ -37,21 +37,17 @@ function validateUser(user){
 
 async function validateUserCredentials(user){
     const existingUser = await userDAO.getUserByUsername(user.username);
-    const passwordMatch = await bcrypt.compare(user.password, existingUser.password);
-    if(existingUser && passwordMatch){
+    if(existingUser){
+        const passwordMatch = await bcrypt.compare(user.password, existingUser.password);
+        if(passwordMatch){
             return existingUser;
-    }
-    else{
-        return null;
+        }else{
+            return null; //password doesnt match
+        }
+    } else{
+        return null; // no existing user
     }
 }
-
-// createUser({username: "test",
-//             password: "test",})
-// validateUserCredentials({username: "test", password: "t"})
-
-// testing purposes
-// createUser({username: "user40", password: "pass400"}); 
 
 module.exports = {
     createUser,
