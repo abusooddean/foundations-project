@@ -1,5 +1,5 @@
-const { DynamoDBClient, QueryCommand} = require("@aws-sdk/client-dynamodb");
-const { DynamoDBDocumentClient, GetCommand, PutCommand, DeleteCommand, ScanCommand} = require("@aws-sdk/lib-dynamodb")
+const { DynamoDBClient} = require("@aws-sdk/client-dynamodb");
+const { DynamoDBDocumentClient, GetCommand, PutCommand, ScanCommand} = require("@aws-sdk/lib-dynamodb")
 const {logger} = require('../util/logger');
 
 const client = new DynamoDBClient({region: "us-east-1"});
@@ -26,8 +26,6 @@ async function createUser(user){
     }
 }
 
-// createUser({user_id: "", username: "usern", password:"passn"});
-
 async function getUserByUserId(user_id){
     const command = new GetCommand({
         TableName,
@@ -44,10 +42,6 @@ async function getUserByUserId(user_id){
         return null;
     }
 }
-
-// getUserByUserId("1");
-// getUserByUserId("2");
-// getUserByUserId("3");
 
 // use to verify username exists on login
 //https://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/dynamodb-example-query-scan.html
@@ -68,8 +62,6 @@ async function getUserByUsername(username){
         return null;
     }
 }
-
-// getUserByUsername("user");
 
 module.exports = {
     createUser,
