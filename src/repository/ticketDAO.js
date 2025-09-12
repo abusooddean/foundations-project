@@ -89,7 +89,7 @@ async function updateTicketStatusByTicketId(ticket_id, status){
     }
 }
 
-async function getAllTicketsByUserId(user_id){
+async function getTicketsByUserId(user_id){
     const command = new ScanCommand({
         TableName,
         FilterExpression: "#user_id = :user_id",
@@ -112,5 +112,5 @@ module.exports = {
     getTicketsByStatus,
     getTicketById,
     updateTicketStatusByTicketId,
-    getAllTicketsByUserId
+    getTicketsByUserId
 }

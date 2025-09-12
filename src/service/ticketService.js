@@ -47,9 +47,9 @@ async function getTicketsByStatus(status){
 }
 
 // 4. View Previous Tickets Feature 
-async function getAllTicketsByUserId(user_id){
+async function getTicketsByUserId(user_id){
     if(user_id){ //can add check to see if it exists later
-        const data = await ticketDAO.getAllTicketsByUserId(user_id);
+        const data = await ticketDAO.getTicketsByUserId(user_id);
         logger.info(`Getting all ticket submissions for user: ${JSON.stringify(data)}`)
     }
     else{
@@ -79,5 +79,6 @@ module.exports = {
     createTicket,
     updateTicketStatusByTicketId,
     getTicketsByStatus,
-    validateIsManager
+    validateIsManager,
+    getTicketsByUserId
 }
