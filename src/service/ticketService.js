@@ -22,37 +22,28 @@ async function createTicket(ticket){
 }
 
 // 3. Ticketing System Feature
-async function updateTicketStatusByTicketId(ticket_id, user_id, status){  
+async function updateTicketStatusByTicketId(ticket_id, status){  
     //get user and verify isManager
-    if(await validateIsManager(user_id)){ //isManager
-        if(ticket_id && status){ //not empty
-            if(await validateTicketIsPending(ticket_id)){
-                const data = await ticketDAO.updateTicketStatusByTicketId(ticket_id, status);
-                logger.info(`Updating ticket: ${JSON.stringify(data)}`);
-                return data;
-            }
-        }
-        else{
-            logger.info(`Failed to update ticket: ${JSON.stringify(ticket_id)}`);
-            return null;
-        }      
-    }
-    else{
-        logger.info(`User is not a manager: ${JSON.stringify(user_id)}`);
-        return user_id;
+        if(await validateTicketIsPending(ticket_id)){
+            const data = await ticketDAO.updateTicketStatusByTicketId(ticket_id, status);
+            logger.info(`Updating ticket: ${JSON.stringify(data)}`);
+            return data;
+        }else{
+        logger.info(`Failed to update ticket: ${JSON.stringify(ticket_id)}`);
+        return null;
     }
 }
 
 async function getTicketsByStatus(status){
-        if(status){
-            const data = await ticketDAO.getTicketsByStatus(status);
-            logger.info(`Getting all pending ticket: ${JSON.stringify(data)}`);
-            return data;
-        }
-        else{
-            logger.info(`Unable to get tickets: ${JSON.stringify(data)}`);
-            return null;
-        }
+    if(status){
+        const data = await ticketDAO.getTicketsByStatus(status);
+        logger.info(`Getting all pending ticket: ${JSON.stringify(data)}`);
+        return data;
+    }
+    else{
+        logger.info(`Unable to get tickets: ${JSON.stringify(data)}`);
+        return null;
+    }
 }
 
 // 4. View Previous Tickets Feature 
