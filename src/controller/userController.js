@@ -11,7 +11,7 @@ const {authenticateToken } = require("../util/jwt");
 const SECRET_KEY = process.env.SECRET_KEY;
 
 //user register
-router.post("/register", validateCreateUser, checkIfUsernameExists, async (req, res) => {
+router.post("/register", validateUserData, checkIfUsernameExists, async (req, res) => {
     const data = await userService.createUser(req.body);
     if(data){
         res.status(201).json({message: `Created User ${JSON.stringify(data)}`});
@@ -21,7 +21,7 @@ router.post("/register", validateCreateUser, checkIfUsernameExists, async (req, 
 } )
 
 //user login
-router.post("/login", async (req, res) => {
+router.post("/login", validateUserData, async (req, res) => {
     const {username, password} = req.body;
     const data = await userService.validateUserCredentials({username, password});
     if(data){
@@ -41,7 +41,7 @@ router.post("/login", async (req, res) => {
     }
 })
 
-function validateCreateUser(req, res, next){
+function validateUserData(req, res, next){
     const user = req.body;
     if(user.username && user.password){
         next();
