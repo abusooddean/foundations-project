@@ -1,6 +1,7 @@
 const express = require('express')
 const router = express.Router();
 const ticketService = require("../service/ticketService");
+const {authenticateToken, authorizeManager} = require("../util/jwt");
 
 
 // //The submit ticket feature is meant to guide you through input acceptance, validation, and error handling. 
@@ -18,67 +19,67 @@ router.post("/", validateTicketData, async (req, res) => {
 })
 
 //get all pending tickets
-router.get("/", validateIsManager, async (req, res) => {
-    const data = await ticketService.getTicketsByStatus(req.body.status);
-    if(data){
-        res.status(201).json({message: `All pending tickets: ${JSON.stringify(data)}`})
+router.get("/", authenticateToken, authorizeManager, async (req, res) => {
+    const status = req.query.status;
+    if (!status) return res.status(400).json({ message: "No status queried" });
+
+    const tickets = await ticketService.getTicketsByStatus(status);
+    if (tickets) {
+        res.status(200).json({ message: `Tickets with status ${status}`, data: tickets });
     }else{
-        res.status(400).json({message: "No pending tickets found", data: req.body});
+        res.status(400).json({ message: "No tickets found" });
     }
-})
+});
 
 //update pending ticket
-router.post("/update", validateTicketUpdateData && validateIsManager, async (req, res) => {
-    const data = await ticketService.updateTicketStatusByTicketId(req.body.ticket_id, req.body.status)
-    if(data){
-        res.status(201).json({message: `Ticket updated: ${JSON.stringify(data)}`})
+router.patch("/update", authenticateToken, authorizeManager, validateTicketUpdateData, async (req, res) => {
+    const updatedTicket = await ticketService.updateTicketStatusByTicketId(req.body.ticket_id, req.body.status);
+    if(updatedTicket) {
+        res.status(200).json({message: "Ticket updated successfully", data: updatedTicket});
     }else{
-        res.status(400).json({message: "No ticket found", data: req.body});
+        res.status(400).json({message: "Ticket not updated", data: req.body});
     }
-})
+});
 
 //get tickets by user_id https://github.com/expressjs/express/blob/master/examples/params/index.js
-router.get("/submissions/:userId", async (req, res) => {
-    const userId = req.query.user_id;
-    const data = await ticketService.getTicketsByUserId(userId);
-    if(data){
-        res.status(201).json({message: `All user tickets: ${JSON.stringify(data)}`})
-    }else{
-        res.status(400).json({message: "No tickets found", data: req.body});
+router.get("/past", authenticateToken, async (req, res) => {
+    const userId = req.user.user_id;
+    const username = req.user.username;
+    const queryUser = req.query.user;
+
+    if(queryUser && queryUser !== username) {
+        return res.status(400).json({ message: "Cannot view other users' tickets" });
     }
-})
+
+    const tickets = await ticketService.getTicketsByUserId(userId);
+    if(tickets) {
+        res.status(200).json({ message: `Tickets submitted by ${username}`, data: tickets });
+    }else{
+        res.status(400).json({ message: `No tickets found for ${username}` });
+    }
+});
 
 //middleware/validation checks
 function validateTicketData(req, res, next){
     const ticket = req.body;
-    if(ticket.ticket && ticket.amount && ticket.description){
+    if(ticket.amount && ticket.description){
         next();
     }else{
-        res.status(400).json({message: "Invalid user_id, amount, or description", data: ticket});
-    }
-}
-
-async function validateIsManager(req, res, next){
-    const user_id = req.body.user_id;
-    if(user_id){
-        if(await ticketService.validateIsManager(user_id)){
-            next();
-        }else{
-            res.status(400).json({message: "User is not a manager", data: user_id});
+        if(!ticket.amount){
+            res.status(400).json({message: "Invalid ticket amount", data: ticket});
+        }else if(!ticket.description){
+            res.status(400).json({message: "Missing ticket description", data: ticket});
         }
-    } else{
-        res.status(400).json({message: "User is not authorized", data: user_id});
-    }   
+    }
 }
 
 function validateTicketUpdateData(req, res, next){
-    const ticket = req.body ;
+    const ticket = req.body;
     if(ticket.ticket_id && ticket.status){
         next();
-    }else{
-        res.status(400).json({message: "Invalid ticket_id or status", data: ticket});
+    } else {
+        res.status(400).json({message: "Missing ticket_id or status", data: ticket});
     }
-
 }
 
 module.exports = router;

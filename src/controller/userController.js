@@ -1,11 +1,8 @@
 require("dotenv").config();
 const express = require('express')
 const router = express.Router();
-const {logger} = require('../util/logger');
 const jwt = require('jsonwebtoken');
-const bcrypt = require('bcrypt');
 const userService = require("../service/userService");
-const {authenticateToken } = require("../util/jwt");
 
 
 const SECRET_KEY = process.env.SECRET_KEY;
@@ -38,7 +35,7 @@ router.post("/login", validateUserData, async (req, res) => {
         );
         res.status(200).json({message: "You have logged in", token});
     }else{
-        res.status(401).json({message: "Invalid login"});
+        res.status(400).json({message: "Invalid login"});
     }
 })
 

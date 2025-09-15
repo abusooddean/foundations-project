@@ -6,7 +6,6 @@ const SECRET_KEY = process.env.SECRET_KEY;
 function authenticateToken(req, res, next) {
     const authHeader = req.headers["authorization"];
     const token = authHeader && authHeader.split(" ")[1];
-    console.log(token)
 
     if (!token) {
         return res.status(400).json({ message: "No token" });
