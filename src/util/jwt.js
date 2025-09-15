@@ -1,40 +1,48 @@
 require("dotenv").config(); //https://www.npmjs.com/package/dotenv
 const jwt = require("jsonwebtoken");
-const logger = require("./logger")
 
 const SECRET_KEY = process.env.SECRET_KEY;
-// console.log(SECRET_KEY);
 
-async function authenticateToken(req, res, next){
-    //Authorization : "Bearer tokenstring"
-    const authHeader = req.headers["Authorization"];
+function authenticateToken(req, res, next) {
+    const authHeader = req.headers["authorization"];
     const token = authHeader && authHeader.split(" ")[1];
+    console.log(token)
 
-    if(!token){
-        res.status(400).json({message: "forbidden access"});
-    } else{
-        const user = await decodeJWT(token);
-        if(user){
-            req.user = user;
-            next();
-        } else{
-            res.status(400).json({message: "Bad JWT"});
-        }
+    if (!token) {
+        return res.status(400).json({ message: "No token" });
     }
+
+    const user = decodeJWT(token);
+    if (!user) {
+        return res.status(400).json({ message: "Invalid token" });
+    }
+
+    req.user = user;
+    next();
 }
 
+function authorizeManager(req, res, next) {
+    if (!req.user) {
+        return res.status(400).json({ message: "Unauthorized" });
+    }
 
+    if (!req.user.isManager) {
+        return res.status(400).json({ message: "Access denied, only managers allowed" });
+    }
 
-async function decodeJWT(token){
+    next();
+}
+
+function decodeJWT(token){
     try{
-        const user = await jwt.verify(token, SECRET_KEY);
+        const user = jwt.verify(token, SECRET_KEY);
         return user;
     } catch(error){
-        logger.error(error);
         return null;
     }
 }
 
 module.exports = {
-    authenticateToken
+    authenticateToken,
+    authorizeManager
 }
