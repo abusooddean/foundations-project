@@ -81,7 +81,7 @@ async function updateTicketStatusByTicketId(ticket_id, status){
     try{
         const data = await documentClient.send(command);
         logger.info(`UPDATE command to database complete ${JSON.stringify(data)}`);
-        return ticket_id;
+        return data.Attributes;
     }
     catch(error){
         console.log(error);

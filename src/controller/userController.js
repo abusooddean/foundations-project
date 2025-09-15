@@ -27,12 +27,13 @@ router.post("/login", validateUserData, async (req, res) => {
     if(data){
         const token = jwt.sign(
             {
-                id: data.user_id,
-                username
+                user_id: data.user_id,
+                username: data.username,
+                isManager: data.isManager
             },
             SECRET_KEY,
             {
-                expiresIn: "15m"
+                expiresIn: "1d"
             }
         );
         res.status(200).json({message: "You have logged in", token});
