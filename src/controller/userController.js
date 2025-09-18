@@ -11,13 +11,13 @@ const SECRET_KEY = process.env.SECRET_KEY;
 router.post("/register", validateUserData, async (req, res) => {
     const data = await userService.createUser(req.body);
     if(data.status === "created"){
-        res.status(201).json({message: `Created User ${JSON.stringify(data)}`});
+        res.status(201).json({message: `Created User: ${req.body.username}`});
     }else if(data.status === "exists"){
-        res.status(400).json({message: `Username already exists ${JSON.stringify(data)}`});
+        res.status(400).json({message: `Username already exists: ${req.body.username} `});
     }else{
-        res.status(400).json({message: "User not created", data: req.body});
+        res.status(400).json({message: "User not created: ", data: req.body});
     }
-} )
+})
 
 //user login
 router.post("/login", validateUserData, async (req, res) => {
@@ -37,7 +37,7 @@ router.post("/login", validateUserData, async (req, res) => {
         );
         res.status(200).json({message: "You have logged in", token});
     }else{
-        res.status(400).json({message: "Invalid login"});
+        res.status(400).json({message: "Invalid credentials"});
     }
 })
 
