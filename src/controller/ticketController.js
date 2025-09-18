@@ -80,7 +80,7 @@ function validateTicketData(req, res, next){
 function validateTicketUpdateData(req, res, next){
     const status = req.body.status;
     if(status !== "Approved" && status !== "Denied"){
-        res.status(400).json({message: `Only "Approved" and "Denied" are supported`});
+        return res.status(400).json({message: `Only "Approved" and "Denied" are supported`});
     }
         
     next();
