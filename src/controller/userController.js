@@ -8,10 +8,12 @@ const userService = require("../service/userService");
 const SECRET_KEY = process.env.SECRET_KEY;
 
 //user register
-router.post("/register", validateUserData, checkIfUsernameExists, async (req, res) => {
+router.post("/register", validateUserData, async (req, res) => {
     const data = await userService.createUser(req.body);
-    if(data){
+    if(data.status === "created"){
         res.status(201).json({message: `Created User ${JSON.stringify(data)}`});
+    }else if(data.status === "exists"){
+        res.status(400).json({message: `Username already exists ${JSON.stringify(data)}`});
     }else{
         res.status(400).json({message: "User not created", data: req.body});
     }
@@ -48,14 +50,5 @@ function validateUserData(req, res, next){
     }
 }
 
-async function checkIfUsernameExists(req, res, next){
-    const username  = req.body.username;
-    const usernameExists = await userService.checkIfUsernameExists(username);
-    if(usernameExists){
-        res.status(400).json({message: "Username already exists", data: username});
-    }else{
-        next();
-    }
-}
 
 module.exports = router;

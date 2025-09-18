@@ -3,6 +3,10 @@ const bcrypt = require('bcrypt');
 const {logger} = require('../util/logger')
 
 async function createUser(user){
+    if(await checkIfUsernameExists(user.username)){
+        return {status: "exists"};
+    }
+
     const saltRounds = 10;
     const password = await bcrypt.hash(user.password, saltRounds);
     const data = await userDAO.createUser({
@@ -12,13 +16,8 @@ async function createUser(user){
         isManager: user.isManager ?? false,
     })
     logger.info(`Creating new user: ${JSON.stringify(data)}`);
-    console.log(data);
 
-    if(data){
-        return user;
-    }else{
-        return null;
-    }  
+    return data ? {status: "created"} : {status: "failed"};
 }
 
 //helper functions
