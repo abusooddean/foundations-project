@@ -33,8 +33,11 @@ router.get("/", authenticateToken, authorizeManager, async (req, res) => {
 });
 
 //update pending ticket
-router.patch("/update", authenticateToken, authorizeManager, validateTicketUpdateData, async (req, res) => {
-    const updatedTicket = await ticketService.updateTicketStatusByTicketId(req.body.ticket_id, req.body.status);
+router.patch("/:ticketid", authenticateToken, authorizeManager, validateTicketUpdateData, async (req, res) => {
+    const ticketId = req.params.ticketid;
+    const status = req.body.status;
+    // console.log(ticketId)
+    const updatedTicket = await ticketService.updateTicketStatusByTicketId(ticketId, status);
     if(updatedTicket) {
         res.status(200).json({message: "Ticket updated successfully", data: updatedTicket});
     }else{
@@ -75,12 +78,12 @@ function validateTicketData(req, res, next){
 }
 
 function validateTicketUpdateData(req, res, next){
-    const ticket = req.body;
-    if(ticket.ticket_id && ticket.status){
-        next();
-    } else {
-        res.status(400).json({message: "Missing ticket_id or status", data: ticket});
+    const status = req.body.status;
+    if(status !== "Approved" && status !== "Denied"){
+        res.status(400).json({message: `Only "Approved" and "Denied" are supported`});
     }
+        
+    next();
 }
 
 module.exports = router;
