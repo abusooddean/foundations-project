@@ -20,6 +20,18 @@ function authenticateToken(req, res, next) {
     next();
 }
 
+function authorizeEmployee(req, res, next) {
+    if (!req.user) {
+        return res.status(400).json({ message: "Unauthorized" });
+    }
+
+    if (req.user.isManager) {
+        return res.status(400).json({ message: "Access denied, only employees allowed" });
+    }
+
+    next();
+}
+
 function authorizeManager(req, res, next) {
     if (!req.user) {
         return res.status(400).json({ message: "Unauthorized" });
@@ -43,5 +55,6 @@ function decodeJWT(token){
 
 module.exports = {
     authenticateToken,
-    authorizeManager
+    authorizeManager,
+    authorizeEmployee
 }

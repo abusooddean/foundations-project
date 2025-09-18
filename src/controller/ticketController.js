@@ -1,7 +1,7 @@
 const express = require('express')
 const router = express.Router();
 const ticketService = require("../service/ticketService");
-const {authenticateToken, authorizeManager} = require("../util/jwt");
+const {authenticateToken, authorizeManager, authorizeEmployee} = require("../util/jwt");
 
 
 // //The submit ticket feature is meant to guide you through input acceptance, validation, and error handling. 
@@ -9,8 +9,9 @@ const {authenticateToken, authorizeManager} = require("../util/jwt");
 // // User Stories Employees can submit a new reimbursement ticket
 
 //create ticket
-router.post("/", validateTicketData, async (req, res) => {
-    const data = await ticketService.createTicket(req.body);
+router.post("/", authenticateToken, authorizeEmployee, validateTicketData, async (req, res) => {
+    const user_id = req.user.user_id;
+    const data = await ticketService.createTicket({...req.body, user_id});
     if(data){
         res.status(201).json({message: `Created ticket ${JSON.stringify(data)}`});
     }else{
